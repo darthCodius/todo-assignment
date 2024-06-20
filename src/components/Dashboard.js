@@ -116,6 +116,7 @@ const Dashboard = () => {
   };
 
   const handleClose = () => {
+    setError(null);
     setIsEditSession(false);
     setShowForm(false);
   };
