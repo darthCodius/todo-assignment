@@ -4,17 +4,17 @@ import { MdEdit } from "react-icons/md";
 import { IoClose } from "react-icons/io5";
 import { useDispatch, useSelector } from "react-redux";
 import { setTasks } from "../utils/tasksSlice";
+import { checkValidData } from "../utils/validate";
 
 const Dashboard = () => {
+  const [id, setId] = useState(null);
   const [showForm, setShowForm] = useState(false);
   const [hideToDoData, sethideToDoData] = useState(false);
   const [hideDoingData, sethideDoingData] = useState(false);
   const [hideDoneData, sethideDoneData] = useState(false);
   const [isEditSession, setIsEditSession] = useState(false);
+  const [error, setError] = useState(null);
   const dispatch = useDispatch();
-
-  const [id, setId] = useState(null);
-
   const taskName = useRef(null);
   const taskAssignee = useRef(null);
   const taskDeadline = useRef(null);
@@ -92,9 +92,19 @@ const Dashboard = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
 
+    const message = checkValidData(
+      taskName.current.value.trim(),
+      taskAssignee.current.value.trim(),
+      taskDeadline.current.value
+    );
+
+    setError(message);
+
+    if (message) return;
+
     const taskData = {
-      name: taskName.current.value,
-      assignee: taskAssignee.current.value,
+      name: taskName.current.value.trim(),
+      assignee: taskAssignee.current.value.trim(),
       date: taskDeadline.current.value,
       status: taskStatus.current.value,
     };
@@ -306,6 +316,12 @@ const Dashboard = () => {
                 <option value="completed">Complete</option>
               </select>
             </span>
+
+            {error && (
+              <div className="flex items-center justify-center">
+                <h1 className="text-sm text-red-500">{error}</h1>
+              </div>
+            )}
 
             <button className="bg-gray-400 p-2 rounded-md hover:bg-gray-500 transition-all duration-200">
               {!isEditSession ? "Add Task" : "Edit Task"}
